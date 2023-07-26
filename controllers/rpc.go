@@ -39,6 +39,12 @@ type JSONRPCResponse struct {
 	Result  json.RawMessage `json:"result"`
 }
 
+type JSONRPCResponse2 struct {
+	JsonRPC string      `json:"jsonrpc"`
+	ID      interface{} `json:"id"`
+	Result  interface{} `json:"result"`
+}
+
 func (ctl *rpcController) translateToBlockNumber(param1 string) string {
 	if param1 == "latest" {
 		return string(ctl.zmqServer.GetFromShortCache("latest"))
@@ -298,6 +304,25 @@ func (ctl *rpcController) GetRPC(c *gin.Context) {
 		}
 
 		response := JSONRPCResponse{
+			JsonRPC: "2.0",
+			ID:      req.ID,
+			Result:  data,
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
+
+	case "eth_gasPrice":
+		data := ctl.zmqServer.GetFromShortCache("gasPrice")
+
+		if len(data) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "no data in the cache to fulfill",
+			})
+			return
+		}
+
+		response := JSONRPCResponse2{
 			JsonRPC: "2.0",
 			ID:      req.ID,
 			Result:  data,

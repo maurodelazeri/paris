@@ -114,18 +114,23 @@ func (n *zmqService) processMessages(ctx context.Context) {
 			restOfTheData := msg[81:]
 			// log.Printf("Topic: %s BlockNumber: %s Hash: %s\n", topic, blockNumber, hash)
 
+			if bytes.Equal(topic, []byte("010")) {
+				n.shortCache.Set("gasPrice", string(restOfTheData), time.Second*15)
+				continue
+			}
+
 			if bytes.Equal(topic, []byte("009")) {
-				n.shortCache.Set("latest", string(restOfTheData), time.Second*12)
+				n.shortCache.Set("latest", string(restOfTheData), time.Second*15)
 				continue
 			}
 
 			if bytes.Equal(topic, []byte("008")) {
-				n.shortCache.Set("final", string(restOfTheData), time.Second*12)
+				n.shortCache.Set("final", string(restOfTheData), time.Second*15)
 				continue
 			}
 
 			if bytes.Equal(topic, []byte("007")) {
-				n.shortCache.Set("safe", string(restOfTheData), time.Second*12)
+				n.shortCache.Set("safe", string(restOfTheData), time.Second*15)
 				continue
 			}
 
