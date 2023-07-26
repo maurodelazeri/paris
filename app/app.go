@@ -11,8 +11,12 @@ import (
 )
 
 var (
-	router = gin.Default()
+	router *gin.Engine
 )
+
+func init() {
+	router = gin.New()
+}
 
 func Run() {
 	/*
@@ -44,7 +48,7 @@ func Run() {
 		====== Setup middlewares ========
 	*/
 	// router.Use(gin.Logger())
-	// router.Use(gin.Recovery())
+	router.Use(gin.Recovery())
 
 	/*
 		====== Setup routes =============

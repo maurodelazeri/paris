@@ -177,7 +177,6 @@ func (n *zmqService) processExtraData(topic, blockNumber, hash, restOfTheData []
 					log.Printf("failed to marshal result: %v", err)
 					continue
 				}
-				fmt.Println(trace.TxHash)
 				n.longCache.Set(string(topic)+"_"+trace.TxHash, jsonResult, time.Hour)
 			}
 		}(restOfTheData)

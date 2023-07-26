@@ -170,52 +170,141 @@ func (ctl *rpcController) GetRPC(c *gin.Context) {
 		return
 
 	case "eth_getTransactionReceipt":
-		// handle method 2
-		// ...
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Method 2 executed",
-			// ... return any other necessary info
-		})
+		data := ctl.zmqServer.GetFromLongCache("002_" + req.Params[0].(string))
+
+		if len(data) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "no data in the cache to fullfil",
+			})
+			return
+		}
+
+		response := JSONRPCResponse{
+			JsonRPC: "2.0",
+			ID:      req.ID,
+			Result:  data,
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
 
 	case "eth_getBlockReceipts":
-		// handle method 2
-		// ...
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Method 2 executed",
-			// ... return any other necessary info
-		})
+		data := ctl.zmqServer.GetFromLongCache("002_" + ctl.translateToBlockNumber(req.Params[0].(string)))
+
+		if len(data) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "no data in the cache to fullfil",
+			})
+			return
+		}
+
+		response := JSONRPCResponse{
+			JsonRPC: "2.0",
+			ID:      req.ID,
+			Result:  data,
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
 
 	case "eth_getBlockByNumber":
-		// handle method 2
-		// ...
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Method 2 executed",
-			// ... return any other necessary info
-		})
+		if len(req.Params) != 2 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "wrong number of parameters",
+			})
+			return
+		}
 
+		fulltx := req.Params[1].(bool)
+		var data []byte
+		if fulltx {
+			data = ctl.zmqServer.GetFromLongCache("001_" + ctl.translateToBlockNumber(req.Params[0].(string)))
+		} else {
+			data = ctl.zmqServer.GetFromLongCache("000_" + ctl.translateToBlockNumber(req.Params[0].(string)))
+		}
+
+		if len(data) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "no data in the cache to fullfil",
+			})
+			return
+		}
+
+		response := JSONRPCResponse{
+			JsonRPC: "2.0",
+			ID:      req.ID,
+			Result:  data,
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
 	case "eth_getBlockByHash":
-		// handle method 2
-		// ...
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Method 2 executed",
-			// ... return any other necessary info
-		})
+		if len(req.Params) != 2 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "wrong number of parameters",
+			})
+			return
+		}
 
+		fulltx := req.Params[1].(bool)
+		var data []byte
+		if fulltx {
+			data = ctl.zmqServer.GetFromLongCache("001_" + ctl.translateToBlockNumber(req.Params[0].(string)))
+		} else {
+			data = ctl.zmqServer.GetFromLongCache("000_" + ctl.translateToBlockNumber(req.Params[0].(string)))
+		}
+
+		if len(data) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "no data in the cache to fullfil",
+			})
+			return
+		}
+
+		response := JSONRPCResponse{
+			JsonRPC: "2.0",
+			ID:      req.ID,
+			Result:  data,
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
 	case "eth_getBalance":
-		// handle method 2
-		// ...
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Method 2 executed",
-			// ... return any other necessary info
-		})
+		data := ctl.zmqServer.GetFromLongCache("003_" + ctl.translateToBlockNumber(req.Params[0].(string)))
 
+		if len(data) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "no data in the cache to fullfil",
+			})
+			return
+		}
+
+		response := JSONRPCResponse{
+			JsonRPC: "2.0",
+			ID:      req.ID,
+			Result:  data,
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
 	case "eth_getCode":
-		// handle method 2
-		// ...
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Method 2 executed",
-			// ... return any other necessary info
-		})
+		data := ctl.zmqServer.GetFromLongCache("004_" + ctl.translateToBlockNumber(req.Params[0].(string)))
+
+		if len(data) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "no data in the cache to fullfil",
+			})
+			return
+		}
+
+		response := JSONRPCResponse{
+			JsonRPC: "2.0",
+			ID:      req.ID,
+			Result:  data,
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
 
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{
