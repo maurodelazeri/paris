@@ -39,7 +39,7 @@ func NewZMQService(stats *statsd.Client) ZMQService {
 		socket:     zmq.NewSub(context.Background()),
 		msgChan:    make(chan []byte, 1000),
 		longCache:  ttlcache.New[string, []byte](ttlcache.WithTTL[string, []byte](30 * time.Minute)),
-		shortCache: ttlcache.New[string, string](ttlcache.WithTTL[string, string](12 * time.Second)),
+		shortCache: ttlcache.New[string, string](ttlcache.WithTTL[string, string](15 * time.Second)),
 	}
 }
 
