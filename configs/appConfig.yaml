@@ -1,0 +1,2 @@
+---
+datadog_url: quicknode-datadog.datadog.svc.cluster.local:8125
