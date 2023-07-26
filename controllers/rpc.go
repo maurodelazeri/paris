@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -66,17 +65,33 @@ func (ctl *rpcController) GetRPC(c *gin.Context) {
 	switch req.Method {
 	case "debug_traceBlockByNumber":
 
+		tracer := req.Params[1].(map[string]interface{})["tracer"]
+		if tracer != "callTracer" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "support only for callTracer",
+			})
+			return
+		}
+
 		withLogs := false
 		if len(req.Params) >= 2 {
 			log := req.Params[1].(map[string]interface{})["tracerConfig"].(map[string]interface{})["withLog"]
 			if log != nil {
-				if log == "true" {
+				if log.(bool) {
 					withLogs = true
 				}
 			}
-		}
 
-		fmt.Println("EAAAAAAAAAAAAAAAA", req.Params[0].(string))
+			topcalls := req.Params[1].(map[string]interface{})["tracerConfig"].(map[string]interface{})["onlyTopCall"]
+			if topcalls != nil {
+				if topcalls.(bool) {
+					c.JSON(http.StatusBadRequest, gin.H{
+						"message": "onlyTopCall supported as false only",
+					})
+					return
+				}
+			}
+		}
 
 		var data []byte
 		if withLogs {
@@ -89,6 +104,7 @@ func (ctl *rpcController) GetRPC(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "no data in the cache to fullfil",
 			})
+			return
 		}
 
 		response := JSONRPCResponse{
@@ -101,12 +117,57 @@ func (ctl *rpcController) GetRPC(c *gin.Context) {
 		return
 
 	case "debug_traceTransaction":
-		// handle method 2
-		// ...
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Method 2 executed",
-			// ... return any other necessary info
-		})
+
+		tracer := req.Params[1].(map[string]interface{})["tracer"]
+		if tracer != "callTracer" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "support only for callTracer",
+			})
+			return
+		}
+
+		withLogs := false
+		if len(req.Params) >= 2 {
+			log := req.Params[1].(map[string]interface{})["tracerConfig"].(map[string]interface{})["withLog"]
+			if log != nil {
+				if log.(bool) {
+					withLogs = true
+				}
+			}
+
+			topcalls := req.Params[1].(map[string]interface{})["tracerConfig"].(map[string]interface{})["onlyTopCall"]
+			if topcalls != nil {
+				if topcalls.(bool) {
+					c.JSON(http.StatusBadRequest, gin.H{
+						"message": "onlyTopCall supported as false only",
+					})
+					return
+				}
+			}
+		}
+
+		var data []byte
+		if withLogs {
+			data = ctl.zmqServer.GetFromLongCache("005_" + req.Params[0].(string))
+		} else {
+			data = ctl.zmqServer.GetFromLongCache("006_" + req.Params[0].(string))
+		}
+
+		if len(data) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "no data in the cache to fullfil",
+			})
+			return
+		}
+
+		response := JSONRPCResponse{
+			JsonRPC: "2.0",
+			ID:      req.ID,
+			Result:  data,
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
 
 	case "eth_getTransactionReceipt":
 		// handle method 2

@@ -106,7 +106,7 @@ func (n *zmqService) processMessages(ctx context.Context) {
 			blockNumber := msg[4:13]
 			hash := msg[14:79]
 			restOfTheData := msg[81:]
-			//log.Printf("Topic: %s BlockNumber: %s Hash: %s\n", topic, blockNumber, hash)
+			// log.Printf("Topic: %s BlockNumber: %s Hash: %s\n", topic, blockNumber, hash)
 
 			if bytes.Equal(topic, []byte("009")) {
 				n.shortCache.Set("latest", string(restOfTheData), time.Second*12)
@@ -177,7 +177,8 @@ func (n *zmqService) processExtraData(topic, blockNumber, hash, restOfTheData []
 					log.Printf("failed to marshal result: %v", err)
 					continue
 				}
-				n.longCache.Set(trace.TxHash, jsonResult, time.Hour)
+				fmt.Println(trace.TxHash)
+				n.longCache.Set(string(topic)+"_"+trace.TxHash, jsonResult, time.Hour)
 			}
 		}(restOfTheData)
 	}
@@ -197,7 +198,7 @@ func (n *zmqService) processExtraData(topic, blockNumber, hash, restOfTheData []
 					log.Printf("failed to marshal data: %v", err)
 					continue
 				}
-				n.longCache.Set(transaction.TransactionHash, jsonData, time.Hour)
+				n.longCache.Set(string(topic)+"_"+transaction.TransactionHash, jsonData, time.Hour)
 			}
 		}(restOfTheData)
 	}
