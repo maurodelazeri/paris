@@ -331,6 +331,24 @@ func (ctl *rpcController) GetRPC(c *gin.Context) {
 		c.JSON(http.StatusOK, response)
 		return
 
+	case "eth_blockNumber":
+		data := ctl.zmqServer.GetFromShortCache("latest")
+
+		if len(data) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "no data in the cache to fulfill",
+			})
+			return
+		}
+
+		response := JSONRPCResponse2{
+			JsonRPC: "2.0",
+			ID:      req.ID,
+			Result:  data,
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Unknown method",

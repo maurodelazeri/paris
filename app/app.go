@@ -47,8 +47,8 @@ func Run() {
 	/*
 		====== Setup middlewares ========
 	*/
-	// router.Use(gin.Logger())
-	router.Use(gin.Recovery())
+	router.Use(gin.Logger())
+	// router.Use(gin.Recovery())
 
 	/*
 		====== Setup routes =============
