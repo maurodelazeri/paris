@@ -83,11 +83,17 @@ func (n *zmqService) Start(ctx context.Context) error {
 
 func (n *zmqService) GetFromLongCache(key string) []byte {
 	value := n.longCache.Get(key)
+	if value == nil {
+		return nil
+	}
 	return value.Value()
 }
 
 func (n *zmqService) GetFromShortCache(key string) string {
 	value := n.shortCache.Get(key)
+	if value == nil {
+		return ""
+	}
 	return value.Value()
 }
 
