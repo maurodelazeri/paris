@@ -98,6 +98,7 @@ func (n *zmqService) GetFromShortCache(key string) string {
 }
 
 func (n *zmqService) processMessages(ctx context.Context) {
+	first_message := true
 	for {
 		select {
 		case <-ctx.Done():
@@ -112,7 +113,11 @@ func (n *zmqService) processMessages(ctx context.Context) {
 			blockNumber := msg[4:13]
 			hash := msg[14:79]
 			restOfTheData := msg[81:]
-			// log.Printf("Topic: %s BlockNumber: %s Hash: %s\n", topic, blockNumber, hash)
+
+			if first_message {
+				log.Printf("Topic: %s BlockNumber: %s Hash: %s\n", topic, blockNumber, hash)
+				first_message = false
+			}
 
 			if bytes.Equal(topic, []byte("010")) {
 				n.shortCache.Set("gasPrice", string(restOfTheData), time.Second*15)

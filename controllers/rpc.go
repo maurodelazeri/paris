@@ -71,30 +71,35 @@ func (ctl *rpcController) GetRPC(c *gin.Context) {
 	switch req.Method {
 	case "debug_traceBlockByNumber":
 
-		tracer := req.Params[1].(map[string]interface{})["tracer"]
-		if tracer != "callTracer" {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "support only for callTracer",
-			})
-			return
+		tracer, ok := req.Params[1].(map[string]interface{})["tracer"]
+		if !ok {
+		} else {
+			if tracer != "callTracer" {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"message": "support only for callTracer",
+				})
+				return
+			}
 		}
 
 		withLogs := false
 		if len(req.Params) >= 2 {
-			log := req.Params[1].(map[string]interface{})["tracerConfig"].(map[string]interface{})["withLog"]
-			if log != nil {
-				if log.(bool) {
-					withLogs = true
-				}
-			}
+			paramsMap, ok := req.Params[1].(map[string]interface{})
+			if ok {
+				tracerConfig, ok := paramsMap["tracerConfig"].(map[string]interface{})
+				if ok {
+					log, ok := tracerConfig["withLog"].(bool)
+					if ok && log {
+						withLogs = true
+					}
 
-			topcalls := req.Params[1].(map[string]interface{})["tracerConfig"].(map[string]interface{})["onlyTopCall"]
-			if topcalls != nil {
-				if topcalls.(bool) {
-					c.JSON(http.StatusBadRequest, gin.H{
-						"message": "onlyTopCall supported as false only",
-					})
-					return
+					topcalls, ok := tracerConfig["onlyTopCall"].(bool)
+					if ok && topcalls {
+						c.JSON(http.StatusBadRequest, gin.H{
+							"message": "onlyTopCall supported as false only",
+						})
+						return
+					}
 				}
 			}
 		}
@@ -124,30 +129,35 @@ func (ctl *rpcController) GetRPC(c *gin.Context) {
 
 	case "debug_traceTransaction":
 
-		tracer := req.Params[1].(map[string]interface{})["tracer"]
-		if tracer != "callTracer" {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "support only for callTracer",
-			})
-			return
+		tracer, ok := req.Params[1].(map[string]interface{})["tracer"]
+		if !ok {
+		} else {
+			if tracer != "callTracer" {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"message": "support only for callTracer",
+				})
+				return
+			}
 		}
 
 		withLogs := false
 		if len(req.Params) >= 2 {
-			log := req.Params[1].(map[string]interface{})["tracerConfig"].(map[string]interface{})["withLog"]
-			if log != nil {
-				if log.(bool) {
-					withLogs = true
-				}
-			}
+			paramsMap, ok := req.Params[1].(map[string]interface{})
+			if ok {
+				tracerConfig, ok := paramsMap["tracerConfig"].(map[string]interface{})
+				if ok {
+					log, ok := tracerConfig["withLog"].(bool)
+					if ok && log {
+						withLogs = true
+					}
 
-			topcalls := req.Params[1].(map[string]interface{})["tracerConfig"].(map[string]interface{})["onlyTopCall"]
-			if topcalls != nil {
-				if topcalls.(bool) {
-					c.JSON(http.StatusBadRequest, gin.H{
-						"message": "onlyTopCall supported as false only",
-					})
-					return
+					topcalls, ok := tracerConfig["onlyTopCall"].(bool)
+					if ok && topcalls {
+						c.JSON(http.StatusBadRequest, gin.H{
+							"message": "onlyTopCall supported as false only",
+						})
+						return
+					}
 				}
 			}
 		}
